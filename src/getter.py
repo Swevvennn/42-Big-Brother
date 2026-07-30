@@ -17,7 +17,7 @@ def get_ratio(students):
     
 def get_data(students, cache=loader()):
     for student in tqdm(students.keys(), total=len(students), desc="Data loaded", smoothing=1):
-        if student not in cache or time() - cache[student].get("last_mark", time()) > 36000:
+        if student not in cache or time() - cache[student].get("last_mark", 0) > 36000:
             sleep(0.5)
             stud_data = requests.get(f"https://api.intra.42.fr/v2/users/{student}",
                                     headers=headers)
@@ -48,19 +48,24 @@ def get_data(students, cache=loader()):
 
 def get_logtime(students, cache=loader()):
     for student in tqdm(students.keys(), total=len(students), desc="Logtime calculated", smoothing=1):
-        if student not in cache or time() - cache[student].get("last_get", 0) > 3600:
-            sleep(0.5)
-            stud_logtime = requests.get(f"https://api.intra.42.fr/v2/users/{student}/locations",
-                                        headers=headers)
-            total_logtime = 0        
-            for session in stud_logtime.json():
+        if student not in cache or time() - cache[student].get("last_get", 0) > 0:
+            total_logtime = 0
+            i = 0
+            stud_logtime = ['0']
+            while i >= 0 and len(stud_logtime) > 0:
+                sleep(0.5)
+                i+=1
+                stud_logtime = requests.get(f"https://api.intra.42.fr/v2/users/{student}/locations",
+                                            headers=headers,
+                                            params={"page[size]": 100, "page[number]": i}).json()
+                for session in stud_logtime:
                     end = (datetime.fromisoformat(session["end_at"].replace("Z", "+00:00")).timestamp()
-                           if session["end_at"] != None
-                           else datetime.now(timezone.utc).timestamp())
+                        if session["end_at"] != None
+                        else datetime.now(timezone.utc).timestamp())
                     start =  datetime.fromisoformat(session["begin_at"].replace("Z", "+00:00")).timestamp()
                     total_logtime += end - start
-            students[student]['logtime'] = total_logtime//3600
-            students[student]['last_get'] = time()
+                students[student]['logtime'] = total_logtime//3600
+                students[student]['last_get'] = time()
         else:
             students[student]['logtime'] = cache[student].get('logtime', 0)
             students[student]['last_get'] = cache[student].get('last_get', time())
