@@ -9,18 +9,19 @@ def print_table(students):
             if project['name'] not in projects:
                 projects.append(project['name'])
 
-    print("Intra\t\t|"+"|".join([f"{' '.join(project.split()[2:]):^8}" for project in sorted(projects)]))
-    print("----------------"+"+--------"*len(projects))
+    print("Intra\t|"+"|".join([f"{' '.join(project.split()[2:]):^6}" for project in sorted(projects)]))
+    # print("-------"+"+--------"*len(projects))
     for stud in sorted(students, key=lambda stud: len(students[stud].get('projects', {})), reverse=True):
-        printable = stud + '   \t'
+        printable = f"{stud:^8}"
         for name in sorted(projects):
+            len_name = max(6, len(' '.join(name.split()[2:])))
             if name not in [students[stud]['projects'][i]['name'] for i in range(len(students[stud]['projects']))]:
-                printable += f'|    -   '
+                printable += f'|{"-":^{len_name}}'
             else:
                 project = [students[stud]['projects'][i] for i in range(len(students[stud]['projects'])) if students[stud]['projects'][i]['name'] == name]
                 if len(project) > 0:
                     color = "green" if project[0]['valid'] else "red" 
-                    printable += f"|[{color}]{project[0]['mark']:^8}[/{color}]"
+                    printable += f"|[{color}]{project[0]['mark']:^{len_name}}[/{color}]"
         print(printable)
 
 
