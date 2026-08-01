@@ -9,12 +9,12 @@ def print_table(students):
             if project['name'] not in projects:
                 projects.append(project['name'])
 
-    print("Intra\t|"+"|".join([f"{' '.join(project.split()[2:]):^6}" for project in sorted(projects)]))
+    print("Intra\t|"+"|".join([f"{' '.join(project.split()[2:]):^4}" for project in sorted(projects)]))
     # print("-------"+"+--------"*len(projects))
     for stud in sorted(students, key=lambda stud: len(students[stud].get('projects', {})), reverse=True):
         printable = f"{stud:^8}"
         for name in sorted(projects):
-            len_name = max(6, len(' '.join(name.split()[2:])))
+            len_name = max(4, len(' '.join(name.split()[2:])))
             if name not in [students[stud]['projects'][i]['name'] for i in range(len(students[stud]['projects']))]:
                 printable += f'|{"-":^{len_name}}'
             else:
