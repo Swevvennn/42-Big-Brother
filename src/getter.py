@@ -79,9 +79,10 @@ def get_intras():
     students, result = {}, []
     try:
         for i in range(4):
-            result.append(requests.get("https://api.intra.42.fr/v2/cursus/9/users?filter[primary_campus_id]=62&filter[pool_year]=2026&filter[pool_month]=july",
+            result.append(requests.get("https://api.intra.42.fr/v2/cursus/9/users?filter[primary_campus_id]=62&filter[pool_year]=2026&filter[pool_month]=september",
                                     headers=headers,
                                     params={"page[number]": i + 1}).json())
+            sleep(0.5)
 
         for page in result:
             for student in page:
